@@ -19,6 +19,7 @@ WORKDIR /app
 COPY --from=builder /app/package.json .
 COPY --from=builder /app/package-lock.json .
 COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/rssi.mjs .
 
 ENV DATABASE_URL=mysql://root:abogoboga@10.1.1.13:3306/nextlinear
 ENV NEXTAUTH_URL=http://localhost:3000
