@@ -31,7 +31,7 @@ app.get('/rssi', async (req, res) => {
 
     console.log('Login successful!');
 
-    await page.waitForTimeout(2000);
+    await page.waitForTimeout(20000);
 
     await page.mouse.move(50, 250);
     await page.mouse.down();
