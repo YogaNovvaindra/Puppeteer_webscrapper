@@ -5,11 +5,10 @@ const app = express();
 
 app.get('/rssi', async (req, res) => {
   try {
-    const browser = await puppeteer.launch({
-      headless: "new",
+    browser = await puppeteer.launch({
+      headless: true, // Change: Set headless to true
       executablePath: '/usr/bin/google-chrome',
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
-
     });
 
     // const browser = await puppeteer.launch({ headless: 'new' });
@@ -44,22 +43,20 @@ app.get('/rssi', async (req, res) => {
         console.log('Desired Data:', responseData);
         rssi = responseData[0].rssi;
         dbm = responseData[0].dbm;
-        // console.log('RSSI:', rssi);
         break;
       } else {
         console.log('No RSSI value');
-        // console.log('Desired Data:', responseData);
       }
     }
-
-    await page.screenshot({ path: 'example.png' });
-
-    await browser.close();
 
     return res.json({ rssi, dbm });
   } catch (error) {
     console.error('An error occurred:', error);
     res.status(500).json({ error: 'Internal Server Error' });
+  } finally {
+    if (browser) {
+      await browser.close(); // Change: Added browser close in the finally block
+    }
   }
 });
 
