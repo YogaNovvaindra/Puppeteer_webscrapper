@@ -5,7 +5,14 @@ const app = express();
 
 app.get('/rssi', async (req, res) => {
   try {
-    const browser = await puppeteer.launch({ headless: 'new' });
+    const browser = await puppeteer.launch({
+      headless: "new",
+      executablePath: '/usr/bin/google-chrome',
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+
+    });
+
+    // const browser = await puppeteer.launch({ headless: 'new' });
     const page = await browser.newPage();
 
     await page.goto('http://10.0.0.254/login.asp');
@@ -17,7 +24,7 @@ app.get('/rssi', async (req, res) => {
 
     console.log('Login successful!');
 
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(10000);
 
     await page.mouse.move(50, 250);
     await page.mouse.down();
