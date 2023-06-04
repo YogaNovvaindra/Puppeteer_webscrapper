@@ -4,6 +4,7 @@ import puppeteer from 'puppeteer';
 const app = express();
 
 app.get('/rssi', async (req, res) => {
+  let browser;
   try {
     browser = await puppeteer.launch({
       headless: true, // Change: Set headless to true
