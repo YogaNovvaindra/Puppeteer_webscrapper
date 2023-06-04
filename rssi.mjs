@@ -32,7 +32,7 @@ app.get('/rssi', async (req, res) => {
 
     console.log('Click');
 
-    let rssi;
+    let rssi, dbm;
 
     while (true) {
       const response = await page.waitForResponse(response =>
@@ -43,11 +43,12 @@ app.get('/rssi', async (req, res) => {
       if (responseData[0]?.rssi !== undefined) {
         console.log('Desired Data:', responseData);
         rssi = responseData[0].rssi;
-        console.log('RSSI:', rssi);
+        dbm = responseData[0].dbm;
+        // console.log('RSSI:', rssi);
         break;
       } else {
         console.log('No RSSI value');
-        console.log('Desired Data:', responseData);
+        // console.log('Desired Data:', responseData);
       }
     }
 
@@ -55,7 +56,7 @@ app.get('/rssi', async (req, res) => {
 
     await browser.close();
 
-    return res.json({ rssi });
+    return res.json({ rssi, dbm });
   } catch (error) {
     console.error('An error occurred:', error);
     res.status(500).json({ error: 'Internal Server Error' });
