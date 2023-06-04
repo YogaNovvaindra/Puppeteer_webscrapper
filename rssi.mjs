@@ -5,33 +5,19 @@ const app = express();
 
 app.get('/rssi', async (req, res) => {
   try {
-    const browser = await puppeteer.launch({
-      headless: "new",
-      executablePath: '/usr/bin/google-chrome',
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
-
-    });
-    // const browser = await puppeteer.launch({
-    //   headless: 'new',
-    // });
+    const browser = await puppeteer.launch({ headless: 'new' });
     const page = await browser.newPage();
 
     await page.goto('http://10.0.0.254/login.asp');
 
     await page.setViewport({ width: 1280, height: 720 });
 
-    // Enter username and password
     await page.type('#password', 'maintain');
-
-    // Click on the login button
-    await Promise.all([
-      page.click('#login'),
-      page.waitForNavigation(), // Wait for page navigation to complete
-    ]);
+    await Promise.all([page.click('#login'), page.waitForNavigation()]);
 
     console.log('Login successful!');
 
-    await page.waitForTimeout(20000);
+    await page.waitForTimeout(1000);
 
     await page.mouse.move(50, 250);
     await page.mouse.down();
@@ -41,24 +27,28 @@ app.get('/rssi', async (req, res) => {
 
     let rssi;
 
-    for (let i = 0; i < 3; i++) {
+    while (true) {
       const response = await page.waitForResponse(response =>
         response.url().includes('cstecgi.cgi')
       );
-      const responseData = await response.json(); // Assuming the response data is in JSON format
+      const responseData = await response.json();
 
-      if (i === 2) {
-        console.log('Loop number 2 - Desired Data:', responseData);
+      if (responseData[0]?.rssi !== undefined) {
+        console.log('Desired Data:', responseData);
         rssi = responseData[0].rssi;
         console.log('RSSI:', rssi);
+        break;
+      } else {
+        console.log('No RSSI value');
+        console.log('Desired Data:', responseData);
       }
     }
 
-    // await page.screenshot({ path: 'example.png' });
+    await page.screenshot({ path: 'example.png' });
 
     await browser.close();
 
-    res.json({ rssi });
+    return res.json({ rssi });
   } catch (error) {
     console.error('An error occurred:', error);
     res.status(500).json({ error: 'Internal Server Error' });
